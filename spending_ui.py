@@ -73,25 +73,18 @@ class SpendingChart(QCharts.QChart):
             slices.append(sliver)
             self.outer.append(sliver)
 
-    def update_outer(self, new_data):
-        self.prepareGeometryChange()
-        self.data = new_data
-        for sliver in self.outer.slices():
-            print(sliver.label())
-            for d in new_data:
-                print(d[0])
-                if sliver.label() == d[0]:
-                    sliver.setValue(d[1])
-                    sliver.valueChanged.emit()
-                    new_data.pop(new_data.index(d))
-                else:
-                    sliver = QCharts.QPieSlice(d[0], d[1], parent = None)
-                    sliver.setLabelVisible()
-                    sliver.setColor(QGUI.QColor("#82d3e5"))
-                    sliver.setLabelBrush(QGUI.QColor("#82d3e5"))
+    def update_outer(self, new_date):
+        self.removeSeries(self.outer)
+        self.data = new_date
+        del(self.outer)
+        self.outer = QCharts.QPieSeries()
+        self.set_outer()
+        self.addSeries(self.outer)
+        
+        
 
-                    self.outer.append(sliver)
-        self.geometryChanged.emit()
+    def update_chart(self):
+        self.Geometry
 
 class SpendingWidget(QWidge.QWidget):
     def __init__(self):

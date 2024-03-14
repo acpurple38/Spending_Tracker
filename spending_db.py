@@ -9,13 +9,11 @@ class Spending():
         self.categories = []
         try:
             self.list_tables.append(self.treasurer.execute("SELECT * from Receipts").fetchall())
-            self.categories = self.treasurer.execute("SELECT DISTINCT Category from Receipts").fetchall()
         except sqlite3.OperationalError:
             self.list_tables.append(self.treasurer.execute("""CREATE TABLE Receipts(Purchase TEXT, Cost REAL,
             Category TEXT, Date TEXT);""").fetchall())
 
-        for i in range(len(self.categories)):
-            self.categories[i] = self.categories[i][0]
+        self.find_cats()
 
     def open_tracker(self):
         con = None
@@ -78,10 +76,15 @@ class Spending():
     
     def pie_data(self):
         data = []
-        print(self.categories)
+        self.find_cats()
         for cat in self.categories:
             self.treasurer.execute("SELECT sum(Cost) FROM Receipts WHERE Category LIKE ('%' || ? || '%')", (cat,))
             cat_cost = self.treasurer.fetchone()
             cat_cost = cat_cost[0]
             data.append([cat, int(cat_cost)])
         return data
+    
+    def find_cats(self):
+        self.categories = self.treasurer.execute("SELECT DISTINCT Category from Receipts").fetchall()
+        for i in range(len(self.categories)):
+            self.categories[i] = self.categories[i][0]  
