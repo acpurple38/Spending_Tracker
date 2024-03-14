@@ -49,9 +49,9 @@ class SpendingTableView(QWidge.QTableView):
     def resizeEvent(self, event):
         width = event.size().width()
         self.setColumnWidth(0, int(width * 0.30))
-        self.setColumnWidth(1, int(width * 0.30))
-        self.setColumnWidth(2, int(width * 0.20))
-        self.setColumnWidth(3, int(width * 0.20))
+        self.setColumnWidth(1, int(width * 0.20))
+        self.setColumnWidth(2, int(width * 0.25))
+        self.setColumnWidth(3, int(width * 0.25))
 
 class SpendingChart(QCharts.QChart):
     def __init__(self, data):
@@ -114,8 +114,8 @@ class SpendingWidget(QWidge.QWidget):
         grid.addWidget(self.add_button, 3, 1, 1, 1)
         grid.addWidget(self.rem_button, 3, 2, 1, 1)
         grid.addWidget(self.search_button, 3, 3, 1, 1)
-        grid.addWidget(self.chart_view, 5, 1, 3, 4)
-        grid.addWidget(self.display, 8, 1, 3, 4)
+        grid.addWidget(self.chart_view, 5, 1, 5, 2)
+        grid.addWidget(self.display, 5, 3, 5, 2)
         self.setLayout(grid)
 
     def add_new(self):
@@ -156,7 +156,7 @@ class SpendingWindow(QWidge.QMainWindow):
     
     def initUI(self):
         self.setWindowTitle("Spending Tracker")
-        self.resize(700, 600)
+        self.resize(900, 800)
         self.center = SpendingWidget()
         self.setCentralWidget(self.center)
 
