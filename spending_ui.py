@@ -80,11 +80,6 @@ class SpendingChart(QCharts.QChart):
         self.outer = QCharts.QPieSeries()
         self.set_outer()
         self.addSeries(self.outer)
-        
-        
-
-    def update_chart(self):
-        self.Geometry
 
 class SpendingWidget(QWidge.QWidget):
     def __init__(self):
