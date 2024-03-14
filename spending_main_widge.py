@@ -18,12 +18,18 @@ class SpendingWidget(QWidge.QWidget):
         self.category_label = QWidge.QLabel("Category:")
         self.date_input = QWidge.QLineEdit()
         self.date_label = QWidge.QLabel("Date:")
+
         self.add_button = QWidge.QPushButton('add')
         self.search_button = QWidge.QPushButton('search')
         self.rem_button = QWidge.QPushButton('remove')
-        self.display = SpendingTableView()
-        self.display_model = SpendingTableModel(self.treasury.show_receipts())
-        self.display.setModel(self.display_model)
+
+        self.trans_table = SpendingTableView()
+        self.trans_model = SpendingTableModel(["Purchase", "Cost", "Category", "Date Purchased"], self.treasury.show_receipts())
+        self.trans_table.setModel(self.trans_model)
+
+        self.pie_table = PieTableView()
+        self.pie_model = SpendingTableModel(["Category", "Total"], self.treasury.pie_data())
+        self.pie_table.setModel(self.pie_model)
 
         self.add_button.clicked.connect(self.add_new)
         self.search_button.clicked.connect(self.search_entries)
@@ -48,7 +54,8 @@ class SpendingWidget(QWidge.QWidget):
         grid.addWidget(self.rem_button, 4, 4, 1, 4)
         grid.addWidget(self.search_button, 4, 8, 1, 4)
         grid.addWidget(self.chart_view, 5, 0, 8, 8)
-        grid.addWidget(self.display, 5, 8, 8, 8)
+        grid.addWidget(self.trans_table, 5, 8, 4, 8)
+        grid.addWidget(self.pie_table, 9, 8, 4, 8)
         self.setLayout(grid)
 
     def add_new(self):

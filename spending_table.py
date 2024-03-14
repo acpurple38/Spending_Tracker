@@ -2,7 +2,7 @@ import PyQt6.QtCore as QCore
 import PyQt6.QtWidgets as QWidge
 
 class SpendingTableModel(QCore.QAbstractTableModel):
-    def __init__(self, table_data = None, parent = None):
+    def __init__(self, headers, table_data = None, parent = None):
         super().__init__()
 
         if table_data is None:
@@ -10,7 +10,7 @@ class SpendingTableModel(QCore.QAbstractTableModel):
         
         self.table_data = table_data
 
-        self.headers = ["Purchase", "Cost", "Category", "Date Purchased"]
+        self.headers = headers
     
     def rowCount(self, parent = None, *args, **kwargs):
         return len(self.table_data)
@@ -45,3 +45,13 @@ class SpendingTableView(QWidge.QTableView):
         self.setColumnWidth(1, int(width * 0.20))
         self.setColumnWidth(2, int(width * 0.25))
         self.setColumnWidth(3, int(width * 0.25))
+
+class PieTableView(QWidge.QTableView):
+    def __init__(self):
+        super().__init__()
+        self.setVisible(True)
+
+    def resizeEvent(self, event):
+        width = event.size().width()
+        self.setColumnWidth(0, int(width * 0.50))
+        self.setColumnWidth(1, int(width * 0.50))
