@@ -82,6 +82,10 @@ class Spending():
             cat_cost = self.treasurer.fetchone()
             cat_cost = cat_cost[0]
             data.append([cat, int(cat_cost)])
+        self.treasurer.execute("SELECT sum(Cost) FROM Receipts")
+        tot_cost = self.treasurer.fetchone()
+        tot_cost = tot_cost[0]
+        data.append(["Total",int(tot_cost)])
         return data
     
     def find_cats(self):

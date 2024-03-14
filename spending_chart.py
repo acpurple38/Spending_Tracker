@@ -12,7 +12,7 @@ class SpendingChart(QCharts.QChart):
     
     def set_outer(self):
         slices = []
-        for d in self.data:
+        for d in self.data[:-1]:
             sliver = QCharts.QPieSlice(d[0], d[1], parent = None)
             sliver.setColor(QGUI.QColor("#82d3e5"))
 
