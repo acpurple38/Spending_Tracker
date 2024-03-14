@@ -10,10 +10,14 @@ class SpendingWidget(QWidge.QWidget):
         self.chart_view = QCharts.QChartView(self.chart)
         self.chart_view.show()
 
-        self.purchase_input = QWidge.QLineEdit("Purchase")
-        self.cost_input = QWidge.QLineEdit("Cost")
-        self.category_input = QWidge.QLineEdit("Category")
-        self.date_input = QWidge.QLineEdit("Date")
+        self.purchase_input = QWidge.QLineEdit()
+        self.purchase_label = QWidge.QLabel("Purchase:")
+        self.cost_input = QWidge.QLineEdit()
+        self.cost_label = QWidge.QLabel("Cost:")
+        self.category_input = QWidge.QLineEdit()
+        self.category_label = QWidge.QLabel("Category:")
+        self.date_input = QWidge.QLineEdit()
+        self.date_label = QWidge.QLabel("Date:")
         self.add_button = QWidge.QPushButton('add')
         self.search_button = QWidge.QPushButton('search')
         self.rem_button = QWidge.QPushButton('remove')
@@ -28,15 +32,23 @@ class SpendingWidget(QWidge.QWidget):
         grid = QWidge.QGridLayout()
         grid.setSpacing(10)
 
-        grid.addWidget(self.purchase_input, 1, 1, 1, 2)
-        grid.addWidget(self.date_input, 1, 3, 1, 2)
-        grid.addWidget(self.cost_input, 2, 1, 1, 2)
-        grid.addWidget(self.category_input, 2, 3, 1, 2)
-        grid.addWidget(self.add_button, 3, 1, 1, 1)
-        grid.addWidget(self.rem_button, 3, 2, 1, 1)
-        grid.addWidget(self.search_button, 3, 3, 1, 1)
-        grid.addWidget(self.chart_view, 5, 1, 5, 2)
-        grid.addWidget(self.display, 5, 3, 5, 2)
+        grid.addWidget(self.purchase_label, 0, 0, 1, 1)
+        grid.addWidget(self.purchase_input, 0, 1, 1, 11)
+
+        grid.addWidget(self.cost_label, 0, 12, 1, 1)
+        grid.addWidget(self.cost_input, 0, 13, 1, 3)
+
+        grid.addWidget(self.category_label, 1, 0, 1, 1)
+        grid.addWidget(self.category_input, 1, 1, 1, 11)
+
+        grid.addWidget(self.date_label, 1, 12, 1, 1)
+        grid.addWidget(self.date_input, 1, 13, 1, 3)
+        
+        grid.addWidget(self.add_button, 4, 0, 1, 4)
+        grid.addWidget(self.rem_button, 4, 4, 1, 4)
+        grid.addWidget(self.search_button, 4, 8, 1, 4)
+        grid.addWidget(self.chart_view, 5, 0, 8, 8)
+        grid.addWidget(self.display, 5, 8, 8, 8)
         self.setLayout(grid)
 
     def add_new(self):
