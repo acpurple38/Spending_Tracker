@@ -14,9 +14,7 @@ class SpendingChart(QCharts.QChart):
         slices = []
         for d in self.data:
             sliver = QCharts.QPieSlice(d[0], d[1], parent = None)
-            # sliver.setLabelVisible()
             sliver.setColor(QGUI.QColor("#82d3e5"))
-            # sliver.setLabelBrush(QGUI.QColor("#82d3e5"))
 
             slices.append(sliver)
             self.outer.append(sliver)
@@ -28,3 +26,4 @@ class SpendingChart(QCharts.QChart):
         self.outer = QCharts.QPieSeries()
         self.set_outer()
         self.addSeries(self.outer)
+

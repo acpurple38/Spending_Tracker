@@ -11,8 +11,6 @@ class SpendingTableModel(QCore.QAbstractTableModel):
         self.table_data = table_data
 
         self.headers = ["Purchase", "Cost", "Category", "Date Purchased"]
-        
-        # self.sort_changed_signal = QCore.pyqtSignal(int, int)
     
     def rowCount(self, parent = None, *args, **kwargs):
         return len(self.table_data)
