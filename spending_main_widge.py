@@ -65,7 +65,7 @@ class SpendingWidget(QWidge.QWidget):
         date = self.date_input.text()
         check = self.treasury.add_receipt(purchase, cost, category, date)
         if check != "missing":
-            self.display_model.update_data(self.treasury.show_receipts())
+            self.trans_model.update_data(self.treasury.show_receipts())
             self.chart.update_outer(self.treasury.pie_data())
             self.purchase_input.clear()
             self.cost_input.clear()
@@ -77,7 +77,7 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        self.display_model.update_data(self.treasury.search_receipts(purchase, cost, category, date))
+        self.trans_model.update_data(self.treasury.search_receipts(purchase, cost, category, date))
 
     def rem_entry(self):
         purchase = self.purchase_input.text()
@@ -85,7 +85,7 @@ class SpendingWidget(QWidge.QWidget):
         category = self.category_input.text()
         date = self.date_input.text()
         self.treasury.rem_entry(purchase, cost, category, date)
-        self.display_model.update_data(self.treasury.show_receipts())
+        self.trans_model.update_data(self.treasury.show_receipts())
         self.purchase_input.clear()
         self.cost_input.clear()
         self.category_input.clear()
