@@ -43,8 +43,10 @@ class Spending():
             else:
                 search_terms.pop(i)
                 search_cats.pop(i)
+        if i == 0:
+            self.treasurer.execute("SELECT * FROM Receipts ORDER BY Date DESC")
+            return self.treasurer.fetchall()
         command = "SELECT * FROM Receipts WHERE"
-        terms_added = 0
         for i in range(len(search_terms)):
             command += f' {search_cats[i]} LIKE ("%" || ? || "%")'
             if i < len(search_cats) - 1:
