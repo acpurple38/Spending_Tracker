@@ -35,20 +35,19 @@ class Spending():
         search_terms = [purchase, cost, category, date]
         search_tuple = ()
         search_cats = ["Purchase", "Cost", "Category", "Date"]
-        search_dict = {}
         i = 0
         while i < len(search_terms):
             if search_terms[i] != "":
-                search_dict[search_terms[i]] = search_cats[i]
                 search_tuple = search_tuple + (search_terms[i],)
                 i += 1
             else:
                 search_terms.pop(i)
-        command = "SELECT * FROM Receipts "
+                search_cats.pop(i)
+        command = "SELECT * FROM Receipts WHERE"
         terms_added = 0
-        for i in range(len(search_dict)):
-            command += f'WHERE {search_dict[search_terms[i]]} LIKE ("%" || ? || "%")'
-            if i < len(search_dict) - 1:
+        for i in range(len(search_terms)):
+            command += f' {search_cats[i]} LIKE ("%" || ? || "%")'
+            if i < len(search_cats) - 1:
                 command += " AND "
         command += "ORDER BY Date DESC"
         self.treasurer.execute(command, search_tuple)
