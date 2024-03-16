@@ -32,35 +32,27 @@ class Spending():
         self.treasury.commit()
 
     def search_receipts(self, purchase, cost, category, date):
-        data = []
-        if purchase != "":
-            self.treasurer.execute("SELECT * FROM Receipts WHERE Title LIKE ('%' || ? || '%') ORDER BY Date DESC", (purchase,))
-            new_data = self.treasurer.fetchall()
-            for d in new_data:
-                if d not in data:
-                    data.append(d)
-
-        if cost != "":
-            self.treasurer.execute("SELECT * FROM Receipts WHERE Author LIKE ('%' || ? || '%') ORDER BY Date DESC", (cost,))
-            new_data = self.treasurer.fetchall()
-            for d in new_data:
-                if d not in data:
-                    data.append(d)
-        
-        if category != "":
-            self.treasurer.execute("SELECT * FROM Receipts WHERE Author LIKE ('%' || ? || '%') ORDER BY Date DESC", (category,))
-            new_data = self.treasurer.fetchall()
-            for d in new_data:
-                if d not in data:
-                    data.append(d)
-        
-        if date != "":
-            self.treasurer.execute("SELECT * FROM Receipts WHERE Date LIKE ('%' || ? || '%') ORDER BY Date DESC", (date,))
-            new_data = self.treasurer.fetchall()
-            for d in new_data:
-                if d not in data:
-                    data.append(d)
-        return data
+        search_terms = [purchase, cost, category, date]
+        search_tuple = ()
+        search_cats = ["Purchase", "Cost", "Category", "Date"]
+        search_dict = {}
+        i = 0
+        while i < len(search_terms):
+            if search_terms[i] != "":
+                search_dict[search_terms[i]] = search_cats[i]
+                search_tuple = search_tuple + (search_terms[i],)
+                i += 1
+            else:
+                search_terms.pop(i)
+        command = "SELECT * FROM Receipts "
+        terms_added = 0
+        for i in range(len(search_dict)):
+            command += f'WHERE {search_dict[search_terms[i]]} LIKE ("%" || ? || "%")'
+            if i < len(search_dict) - 1:
+                command += " AND "
+        command += "ORDER BY Date DESC"
+        self.treasurer.execute(command, search_tuple)
+        return self.treasurer.fetchall()
     
     def rem_entry(self, purchase, cost, category, date):
         if purchase == "" and cost == "" and category == "" and date == "":
@@ -91,4 +83,4 @@ class Spending():
     def find_cats(self):
         self.categories = self.treasurer.execute("SELECT DISTINCT Category from Receipts").fetchall()
         for i in range(len(self.categories)):
-            self.categories[i] = self.categories[i][0]  
+            self.categories[i] = self.categories[i][0]

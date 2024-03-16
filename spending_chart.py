@@ -10,7 +10,6 @@ class SpendingChart(QCharts.QChart):
                 '#e9d8a6', '#ee9b00',  '#ca6702',
                 '#bb3e03', '#ae2012', '#9b2226']
 
-
         self.outer = QCharts.QPieSeries()
         self.set_outer()
         self.addSeries(self.outer)
