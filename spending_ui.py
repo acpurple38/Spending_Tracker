@@ -1,6 +1,6 @@
 import sys
 
-from spending_main_widge import *
+from main_widge import *
 
 class SpendingWindow(QWidge.QMainWindow):
     def __init__(self):

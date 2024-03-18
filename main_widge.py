@@ -1,6 +1,6 @@
-from spending_chart import *
-from spending_table import *
-from spending_db import *
+from chart_widge import *
+from table_widge import *
+from db_spending import *
 
 class SpendingWidget(QWidge.QWidget):
     def __init__(self):
