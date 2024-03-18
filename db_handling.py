@@ -7,6 +7,7 @@ class Spending():
         self.treasurer = self.treasury.cursor()
         self.list_tables = []
         self.categories = []
+        self.open_cat = True
         try:
             self.list_tables.append(self.treasurer.execute("SELECT * from Receipts").fetchall())
         except sqlite3.OperationalError:
@@ -25,7 +26,9 @@ class Spending():
 
     def add_receipt(self, purchase, cost, category, date):
         if purchase == "" or cost == "" or category == "":
-            return "missing"
+            return -1
+        if self.open_cat == False and category not in self.categories:
+            return -2
         if date == "":
             date = str(datetime.date.today())
         self.treasurer.execute("INSERT INTO Receipts VALUES(?, ?, ?, ?)", (purchase, cost, category, date))
@@ -115,3 +118,7 @@ class Spending():
         self.categories = self.treasurer.execute("SELECT DISTINCT Category from Receipts").fetchall()
         for i in range(len(self.categories)):
             self.categories[i] = self.categories[i][0]
+        if len(self.categories) < 10:
+            self.open_cat = True
+        else:
+            self.open_cat = False

@@ -64,7 +64,7 @@ class SpendingWidget(QWidge.QWidget):
         category = self.category_input.text()
         date = self.date_input.text()
         check = self.treasury.add_receipt(purchase, cost, category, date)
-        if check != "missing":
+        if check != -1 or check != -2:
             self.trans_model.update_data(self.treasury.show_receipts())
             self.chart.update_outer(self.treasury.pie_data("chart"))
             self.pie_model.update_data(self.treasury.pie_data("table"))
@@ -72,6 +72,8 @@ class SpendingWidget(QWidge.QWidget):
             self.cost_input.clear()
             self.category_input.clear()
             self.date_input.clear()
+        if check == -2:
+            self.category_input.setText("Too Many Categories, delete or try again")
 
     def search_entries(self):
         purchase = self.purchase_input.text()
