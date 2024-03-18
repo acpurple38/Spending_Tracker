@@ -1,5 +1,6 @@
 import PyQt6.QtCharts as QCharts
 import PyQt6.QtGui as QGUI
+import PyQt6.QtWidgets as QWidge
 
 class SpendingChart(QCharts.QChart):
     def __init__(self, data):
@@ -12,12 +13,14 @@ class SpendingChart(QCharts.QChart):
         self.outer = QCharts.QPieSeries()
         self.set_outer()
         self.addSeries(self.outer)
+        self.legend().setVisible(False)
     
     def set_outer(self):
         slices = []
         color = 0
         for d in self.data:
             sliver = QCharts.QPieSlice(d[0], d[1], parent = None)
+            sliver.setLabelVisible(True)
             sliver.setColor(QGUI.QColor(self.colors[color]))
             color += 1
 
