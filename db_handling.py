@@ -31,7 +31,7 @@ class Spending():
         self.treasurer.execute("INSERT INTO Receipts VALUES(?, ?, ?, ?)", (purchase, cost, category, date))
         self.treasury.commit()
 
-    def search_receipts(self, purchase, cost, category, date):
+    def search_command(self, purchase, cost, category, date, use): #use is either "table" or "chart"
         search_terms = [purchase, cost, category, date]
         search_tuple = ()
         search_cats = ["Purchase", "Cost", "Category", "Date"]
@@ -44,16 +44,45 @@ class Spending():
                 search_terms.pop(i)
                 search_cats.pop(i)
         if i == 0:
-            self.treasurer.execute("SELECT * FROM Receipts ORDER BY Date DESC")
-            return self.treasurer.fetchall()
-        command = "SELECT * FROM Receipts WHERE"
+                return -1
+        else:
+            command = "SELECT "
+            if use == "table":
+                command += "*" 
+            if use == "chart":
+                command += "DISTINCT Category"
+            command += " FROM Receipts WHERE"
         for i in range(len(search_terms)):
             command += f' {search_cats[i]} LIKE ("%" || ? || "%")'
             if i < len(search_cats) - 1:
                 command += " AND "
         command += "ORDER BY Date DESC"
-        self.treasurer.execute(command, search_tuple)
+        return [command, search_tuple]
+        
+    def search_receipts_table(self, purchase, cost, category, date):
+        command = self.search_command(purchase, cost, category, date, "table")
+        if command == -1:
+            return self.treasurer.execute("SELECT * FROM Receipts ORDER BY Date DESC").fetchall()
+        self.treasurer.execute(command[0], command[1])
         return self.treasurer.fetchall()
+    
+    def pie_search(self, purchase, cost, category, date):
+        command = self.search_command(purchase, cost, category, date, "chart")
+        if command == -1:
+            return self.pie_data("chart")
+        categories = self.treasurer.execute(command[0], command[1]).fetchall()
+        print(categories)
+        for i in range(len(categories)):
+            categories[i] = categories[i][0]
+        data = []
+        for i in range(len(categories)):
+            search_tuple = (categories[i], ) + command[1]
+            self.treasurer.execute("SELECT sum(Cost) FROM Receipts WHERE Category LIKE ('%' || ? || '%')" 
+                                   + " AND " +command[0][command[0].index("WHERE")+6:], search_tuple)
+            cat_cost = self.treasurer.fetchone()
+            cat_cost = cat_cost[0]
+            data.append([categories[i], int(cat_cost)])
+        return data
     
     def rem_entry(self, purchase, cost, category, date):
         if purchase == "" and cost == "" and category == "" and date == "":
@@ -67,7 +96,7 @@ class Spending():
         data = self.treasurer.fetchall()
         return data
     
-    def pie_data(self):
+    def pie_data(self, use): #use is either chart or table, don't want total to appear in chart
         data = []
         self.find_cats()
         for cat in self.categories:
@@ -78,7 +107,8 @@ class Spending():
         self.treasurer.execute("SELECT sum(Cost) FROM Receipts")
         tot_cost = self.treasurer.fetchone()
         tot_cost = tot_cost[0]
-        data.append(["Total",int(tot_cost)])
+        if use == "table":
+            data.append(["Total",int(tot_cost)])
         return data
     
     def find_cats(self):

@@ -1,12 +1,12 @@
 from chart_widge import *
 from table_widge import *
-from db_spending import *
+from db_handling import *
 
 class SpendingWidget(QWidge.QWidget):
     def __init__(self):
         super().__init__()
         self.treasury = Spending()
-        self.chart = SpendingChart(self.treasury.pie_data())
+        self.chart = SpendingChart(self.treasury.pie_data("chart"))
         self.chart_view = QCharts.QChartView(self.chart)
         self.chart_view.show()
 
@@ -28,7 +28,7 @@ class SpendingWidget(QWidge.QWidget):
         self.trans_table.setModel(self.trans_model)
 
         self.pie_table = PieTableView()
-        self.pie_model = SpendingTableModel(["Category", "Total"], self.treasury.pie_data())
+        self.pie_model = SpendingTableModel(["Category", "Total"], self.treasury.pie_data("table"))
         self.pie_table.setModel(self.pie_model)
 
         self.add_button.clicked.connect(self.add_new)
@@ -66,7 +66,7 @@ class SpendingWidget(QWidge.QWidget):
         check = self.treasury.add_receipt(purchase, cost, category, date)
         if check != "missing":
             self.trans_model.update_data(self.treasury.show_receipts())
-            self.chart.update_outer(self.treasury.pie_data())
+            self.chart.update_outer(self.treasury.pie_data("chart"))
             self.purchase_input.clear()
             self.cost_input.clear()
             self.category_input.clear()
@@ -77,7 +77,8 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        self.trans_model.update_data(self.treasury.search_receipts(purchase, cost, category, date))
+        self.trans_model.update_data(self.treasury.search_receipts_table(purchase, cost, category, date))
+        self.chart.update_outer(self.treasury.pie_search(purchase, cost, category, date))
 
     def rem_entry(self):
         purchase = self.purchase_input.text()
