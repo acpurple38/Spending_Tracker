@@ -1,6 +1,5 @@
 import PyQt6.QtCharts as QCharts
 import PyQt6.QtGui as QGUI
-import PyQt6.QtWidgets as QWidge
 
 class SpendingChart(QCharts.QChart):
     def __init__(self, data):
