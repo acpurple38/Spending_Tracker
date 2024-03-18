@@ -90,6 +90,8 @@ class SpendingWidget(QWidge.QWidget):
         date = self.date_input.text()
         self.treasury.rem_entry(purchase, cost, category, date)
         self.trans_model.update_data(self.treasury.show_receipts())
+        self.chart.update_outer(self.treasury.pie_data("chart"))
+        self.pie_model.update_data(self.treasury.pie_data("table"))
         self.purchase_input.clear()
         self.cost_input.clear()
         self.category_input.clear()
