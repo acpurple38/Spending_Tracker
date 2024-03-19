@@ -25,10 +25,17 @@ class Spending():
             print(sqlite3.Error)
 
     def add_receipt(self, purchase, cost, category, date):
+        errors = ["CODE_ERROR"]
         if purchase == "" or cost == "" or category == "":
-            return -1
+            if purchase == "":
+                errors.append(-1)
+            if cost == "":
+                errors.append(-2)
+            if category == "":
+                errors.append(-3)
         if self.open_cat == False and category not in self.categories:
-            return -2
+            errors.append(-4)
+            return errors
         if date == "":
             date = str(datetime.date.today())
         self.treasurer.execute("INSERT INTO Receipts VALUES(?, ?, ?, ?)", (purchase, cost, category, date))
@@ -88,8 +95,17 @@ class Spending():
         return data
     
     def rem_entry(self, purchase, cost, category, date):
+        errors = ["CODE_ERROR"]
         if purchase == "" and cost == "" and category == "" and date == "":
-            return
+            if purchase == "":
+                errors.append(-1)
+            if cost == "":
+                errors.append(-2)
+            if category == "":
+                errors.append(-3)
+            if date == "":
+                errors.append(-5)
+                return errors
         self.treasurer.execute("""DELETE FROM Receipts WHERE Purchase LIKE ('%' || ? || '%') AND
                                Cost LIKE ('%' || ? || '%') AND Category LIKE ('%' || ? || '%') AND Date LIKE ('%' || ? || '%')""", (purchase, cost, category, date))
         self.treasury.commit()

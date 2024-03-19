@@ -1,6 +1,7 @@
 from chart_widge import *
 from table_widge import *
 from db_handling import *
+from error_window import *
 
 class SpendingWidget(QWidge.QWidget):
     def __init__(self):
@@ -12,11 +13,11 @@ class SpendingWidget(QWidge.QWidget):
 
         self.purchase_input = QWidge.QLineEdit()
         self.purchase_label = QWidge.QLabel("Purchase:")
-        self.cost_input = QWidge.QLineEdit()
+        self.cost_input = QWidge.QLineEdit("##.##")
         self.cost_label = QWidge.QLabel("Cost:")
         self.category_input = QWidge.QLineEdit()
         self.category_label = QWidge.QLabel("Category:")
-        self.date_input = QWidge.QLineEdit()
+        self.date_input = QWidge.QLineEdit("YYYY-MM-DD")
         self.date_label = QWidge.QLabel("Date:")
 
         self.add_button = QWidge.QPushButton('add')
@@ -58,13 +59,19 @@ class SpendingWidget(QWidge.QWidget):
         grid.addWidget(self.pie_table, 9, 8, 4, 8)
         self.setLayout(grid)
 
+        self.error_check = False
+        self.error_mess = ""
+
     def add_new(self):
         purchase = self.purchase_input.text()
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
         check = self.treasury.add_receipt(purchase, cost, category, date)
-        if check != -1 or check != -2:
+        if check[0] == "CODE_ERROR":
+            arg_check = self.arg_formatting(purchase, cost, category, date)
+            self.error_notif("add", check, arg_check)
+        else:
             self.trans_model.update_data(self.treasury.show_receipts())
             self.chart.update_outer(self.treasury.pie_data("chart"))
             self.pie_model.update_data(self.treasury.pie_data("table"))
@@ -72,9 +79,7 @@ class SpendingWidget(QWidge.QWidget):
             self.cost_input.clear()
             self.category_input.clear()
             self.date_input.clear()
-        if check == -2:
-            self.category_input.setText("Too Many Categories, delete or try again")
-
+            
     def search_entries(self):
         purchase = self.purchase_input.text()
         cost = self.cost_input.text()
@@ -90,11 +95,87 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        self.treasury.rem_entry(purchase, cost, category, date)
-        self.trans_model.update_data(self.treasury.show_receipts())
-        self.chart.update_outer(self.treasury.pie_data("chart"))
-        self.pie_model.update_data(self.treasury.pie_data("table"))
-        self.purchase_input.clear()
-        self.cost_input.clear()
-        self.category_input.clear()
-        self.date_input.clear()
+        check = self.treasury.rem_entry(purchase, cost, category, date)
+        if check[0] == "CODE_ERROR":
+            self.error_notif("rem", check)
+        else:
+            self.trans_model.update_data(self.treasury.show_receipts())
+            self.chart.update_outer(self.treasury.pie_data("chart"))
+            self.pie_model.update_data(self.treasury.pie_data("table"))
+            self.purchase_input.clear()
+            self.cost_input.clear()
+            self.category_input.clear()
+            self.date_input.clear()
+
+    def arg_formatting(self, purchase, cost, category, date):
+        args = [purchase, cost, category, date]
+        errors = []
+        for i in range(len(args)):
+            if args[i] != "":
+                if i != 1 and i != 3:
+                    args[i] = args[i].strip()
+                    args[i] = args[i].split(" ")
+                    if len(args[i]) > 1:
+                        for i in range(len(args[i])):
+                            if args[i][i][0].isalpha():
+                                args[i][i] = args[i][i].capitalize()
+                    args[i] = " ".join(args[i])
+                elif i == 1:
+                    args[1] = args[1].split(".")
+                    while i < len(args[1]):
+                        if not args[1][i].isnumeric() or len(args[1]) > 2:
+                            errors.append(-2)
+                            i = len(args[1])
+                    args[1] = ".".join(args[1])
+                else:
+                    if len(args[3]) != 10:
+                        errors.append(-3)
+                        return errors
+                    else:
+                        args[3] = args[3].split("-")
+                        if ("".join(args[3])).isnumeric():
+                            if len(args[3][0]) == 4:
+                                args[3] = "-".join(args[3])
+                            else:
+                                errors.append(-3)
+                                return errors
+                        else:
+                            errors.append(-3)
+                            return errors
+        return args
+
+    def error_notif(self, func, error_code, arg_check):
+        message = ""
+        miss = 0
+        if func == "add" or func == "rem":
+            message += "Missing: \n"
+            for code in error_code:
+                if code == -1:
+                    message += "Purchase Info\n"
+                    miss += 1
+                if code == -2:
+                    message += "Cost Value\n"
+                    miss += 1
+                if code == -3:
+                    message += "Category Value\n"
+                    miss += 1
+                elif code == -4 and func != "add":
+                    message += "Date Value for Remove\n"
+                    miss += 1
+                if code == -4 and func != "rem":
+                    if miss == 0:
+                        message = "Too many categories, remove one or try again\n"
+                    else:
+                        message += "\nToo many categories, remove one or try again\n"
+        if len(arg_check) > 0:
+            message += "\nErrors in Values: \n"
+        for arg in arg_check:
+            if arg == -2:
+                message += "Cost Format\n"
+            if arg == -3:
+                message += "Date Format\n"
+
+        if message != "":
+            dlg = ErrorDialog(message)
+            dlg.exec()
+
