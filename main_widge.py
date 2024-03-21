@@ -67,11 +67,17 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        check = self.treasury.add_receipt(purchase, cost, category, date)
-        if check[0] == "CODE_ERROR":
-            arg_check = self.arg_formatting(purchase, cost, category, date)
+        arg_check = self.arg_formatting(purchase, cost, category, date)
+        if arg_check[0] == "CODE_ERROR":
+            check = self.treasury.add_receipt(purchase, cost, category, date)
             self.error_notif("add", check, arg_check)
+        # if check != None:
         else:
+            purchase = arg_check[0]
+            cost = arg_check[1]
+            category = arg_check[2]
+            date = arg_check[3]
+            self.treasury.add_receipt(purchase, cost, category, date)
             self.trans_model.update_data(self.treasury.show_receipts())
             self.chart.update_outer(self.treasury.pie_data("chart"))
             self.pie_model.update_data(self.treasury.pie_data("table"))
@@ -85,20 +91,33 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        self.trans_model.update_data(self.treasury.search_receipts_table(purchase, cost, category, date))
-        pie_data = self.treasury.pie_search(purchase, cost, category, date)
-        self.chart.update_outer(pie_data)
-        self.pie_model.update_data(pie_data)
+        arg_check = self.arg_formatting(purchase, cost, category, date)
+        if arg_check[0] == "CODE_ERROR":
+            self.error_notif("search", [], arg_check)
+        else:
+            purchase = arg_check[0]
+            cost = arg_check[1]
+            category = arg_check[2]
+            date = arg_check[3]
+            self.trans_model.update_data(self.treasury.search_receipts_table(purchase, cost, category, date))
+            pie_data = self.treasury.pie_search(purchase, cost, category, date)
+            self.chart.update_outer(pie_data)
+            self.pie_model.update_data(pie_data)
 
     def rem_entry(self):
         purchase = self.purchase_input.text()
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
+        arg_check = self.arg_formatting(purchase, cost, category, date)
         check = self.treasury.rem_entry(purchase, cost, category, date)
-        if check[0] == "CODE_ERROR":
-            self.error_notif("rem", check)
+        if check != None:
+            self.error_notif("rem", check, arg_check)
         else:
+            purchase = arg_check[0]
+            cost = arg_check[1]
+            category = arg_check[2]
+            date = arg_check[3]
             self.trans_model.update_data(self.treasury.show_receipts())
             self.chart.update_outer(self.treasury.pie_data("chart"))
             self.pie_model.update_data(self.treasury.pie_data("table"))
@@ -108,8 +127,12 @@ class SpendingWidget(QWidge.QWidget):
             self.date_input.clear()
 
     def arg_formatting(self, purchase, cost, category, date):
+        if cost == "##.##":
+            cost = ""
+        if date == "YYYY-MM-DD":
+            date = ""
         args = [purchase, cost, category, date]
-        errors = []
+        errors = ["CODE_ERROR"]
         for i in range(len(args)):
             if args[i] != "":
                 if i != 1 and i != 3:

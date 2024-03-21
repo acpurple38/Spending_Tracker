@@ -26,16 +26,17 @@ class Spending():
 
     def add_receipt(self, purchase, cost, category, date):
         errors = ["CODE_ERROR"]
-        if purchase == "" or cost == "" or category == "":
+        if purchase == "" or cost == "" or category == "" or self.open_cat == False:
             if purchase == "":
                 errors.append(-1)
             if cost == "":
                 errors.append(-2)
             if category == "":
                 errors.append(-3)
-        if self.open_cat == False and category not in self.categories:
-            errors.append(-4)
-            return errors
+            if category not in self.categories:
+                errors.append(-4)
+            if len(errors) > 1:
+                return errors
         if date == "":
             date = str(datetime.date.today())
         self.treasurer.execute("INSERT INTO Receipts VALUES(?, ?, ?, ?)", (purchase, cost, category, date))
@@ -81,7 +82,6 @@ class Spending():
         if command == -1:
             return self.pie_data("chart")
         categories = self.treasurer.execute(command[0], command[1]).fetchall()
-        print(categories)
         for i in range(len(categories)):
             categories[i] = categories[i][0]
         data = []
@@ -105,7 +105,7 @@ class Spending():
                 errors.append(-3)
             if date == "":
                 errors.append(-5)
-                return errors
+            return errors
         self.treasurer.execute("""DELETE FROM Receipts WHERE Purchase LIKE ('%' || ? || '%') AND
                                Cost LIKE ('%' || ? || '%') AND Category LIKE ('%' || ? || '%') AND Date LIKE ('%' || ? || '%')""", (purchase, cost, category, date))
         self.treasury.commit()
@@ -126,7 +126,7 @@ class Spending():
         self.treasurer.execute("SELECT sum(Cost) FROM Receipts")
         tot_cost = self.treasurer.fetchone()
         tot_cost = tot_cost[0]
-        if use == "table":
+        if use == "table" and self.categories != []:
             data.append(["Total",int(tot_cost)])
         return data
     
@@ -134,7 +134,7 @@ class Spending():
         self.categories = self.treasurer.execute("SELECT DISTINCT Category from Receipts").fetchall()
         for i in range(len(self.categories)):
             self.categories[i] = self.categories[i][0]
-        if len(self.categories) < 10:
+        if len(self.categories) < 12:
             self.open_cat = True
         else:
             self.open_cat = False
