@@ -8,6 +8,8 @@ class Spending():
         self.dtb = []
         self.categories = []
         self.open_cat = True
+        self.year = datetime.date.year
+        self.month = datetime.date.month
         try:
             self.dtb.append(self.treasurer.execute("""SELECT * 
                     from Receipts""").fetchall())
@@ -42,8 +44,7 @@ class Spending():
         if date == "":
             date = str(datetime.date.today())
         self.treasurer.execute("""INSERT INTO Receipts VALUES
-                               (?, ?, ?, ?)""", (purchase, cost, 
-                               category, date))
+                (?, ?, ?, ?)""", (purchase, cost, category, date))
         self.treasury.commit()
 
     def search_command(self, purchase, cost, category, date, use): #use is either "table" or "chart"
@@ -71,14 +72,14 @@ class Spending():
             command += f' {search_cats[i]} LIKE ("%" || ? || "%")'
             if i < len(search_cats) - 1:
                 command += " AND "
-        command += "ORDER BY Date DESC"
+        command += " ORDER BY Date DESC"
         return [command, search_tuple]
         
     def search_receipts_table(self, purchase, cost, category, date):
         command = self.search_command(purchase, cost, category, date, "table")
         if command == -1:
             return self.treasurer.execute("""SELECT * FROM Receipts
-                                         ORDER BY Date DESC""").fetchall()
+                                ORDER BY Date DESC""").fetchall()
         self.treasurer.execute(command[0], command[1])
         return self.treasurer.fetchall()
     
@@ -93,10 +94,10 @@ class Spending():
         for i in range(len(categories)):
             search_tuple = (categories[i], ) + command[1]
             self.treasurer.execute("""SELECT sum(Cost) FROM
-                                  Receipts WHERE Category LIKE 
-                                  ('%' || ? || '%')""" + " AND "
-                                  + command[0][command[0].index("WHERE")+6:],
-                                  search_tuple)
+                            Receipts WHERE Category LIKE 
+                            ('%' || ? || '%')""" + " AND "
+                            + command[0][command[0].index("WHERE")+6:],
+                            search_tuple)
             cat_cost = self.treasurer.fetchone()
             cat_cost = cat_cost[0]
             data.append([categories[i], int(cat_cost)])
