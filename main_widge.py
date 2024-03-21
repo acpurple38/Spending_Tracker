@@ -71,13 +71,8 @@ class SpendingWidget(QWidge.QWidget):
         if arg_check[0] == "CODE_ERROR":
             check = self.treasury.add_receipt(purchase, cost, category, date)
             self.error_notif("add", check, arg_check)
-        # if check != None:
         else:
-            purchase = arg_check[0]
-            cost = arg_check[1]
-            category = arg_check[2]
-            date = arg_check[3]
-            self.treasury.add_receipt(purchase, cost, category, date)
+            self.treasury.add_receipt(arg_check[0], arg_check[1], arg_check[2], arg_check[3])
             self.trans_model.update_data(self.treasury.show_receipts())
             self.chart.update_outer(self.treasury.pie_data("chart"))
             self.pie_model.update_data(self.treasury.pie_data("table"))
@@ -95,12 +90,8 @@ class SpendingWidget(QWidge.QWidget):
         if arg_check[0] == "CODE_ERROR":
             self.error_notif("search", [], arg_check)
         else:
-            purchase = arg_check[0]
-            cost = arg_check[1]
-            category = arg_check[2]
-            date = arg_check[3]
-            self.trans_model.update_data(self.treasury.search_receipts_table(purchase, cost, category, date))
-            pie_data = self.treasury.pie_search(purchase, cost, category, date)
+            self.trans_model.update_data(self.treasury.search_receipts_table(arg_check[0], arg_check[1], arg_check[2], arg_check[3]))
+            pie_data = self.treasury.pie_search(arg_check[0], arg_check[1], arg_check[2], arg_check[3])
             self.chart.update_outer(pie_data)
             self.pie_model.update_data(pie_data)
 
@@ -110,14 +101,10 @@ class SpendingWidget(QWidge.QWidget):
         category = self.category_input.text()
         date = self.date_input.text()
         arg_check = self.arg_formatting("rem", purchase, cost, category, date)
-        check = self.treasury.rem_entry(purchase, cost, category, date)
         if check != None:
             self.error_notif("rem", check, arg_check)
         else:
-            purchase = arg_check[0]
-            cost = arg_check[1]
-            category = arg_check[2]
-            date = arg_check[3]
+            check = self.treasury.rem_entry(arg_check[0], arg_check[1], arg_check[2], arg_check[3])
             self.trans_model.update_data(self.treasury.show_receipts())
             self.chart.update_outer(self.treasury.pie_data("chart"))
             self.pie_model.update_data(self.treasury.pie_data("table"))
