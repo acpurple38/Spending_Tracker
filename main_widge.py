@@ -148,22 +148,21 @@ class SpendingWidget(QWidge.QWidget):
     
     def date_formatting(self, func, date):
         new_date = date
-        errors = 0
         if func != "search":
             if len(new_date) != 10:
-                errors = -3
-                return errors
+                return [-1, -3]
+        if len(new_date) <= 2:
+            return [-1, -3]
+        if new_date.count("-") > 2:
+            return [-1, -3]
         new_date = new_date.split("-")
         if ("".join(new_date)).isnumeric():
             if len(new_date[0]) == 4:
                 new_date = "-".join(new_date)
             else:
-                errors = -3
-                return errors
+                return [-1, -3]
         else:
-            errors = -3
-            return [-1, errors]
-        print(new_date)
+            return [-1, -3]
         return [0, new_date]
 
     def error_notif(self, func, error_code, arg_check):
