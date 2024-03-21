@@ -5,14 +5,16 @@ class Spending():
     def __init__(self):
         self.treasury = self.open_tracker()
         self.treasurer = self.treasury.cursor()
-        self.list_tables = []
+        self.dtb = []
         self.categories = []
         self.open_cat = True
         try:
-            self.list_tables.append(self.treasurer.execute("SELECT * from Receipts").fetchall())
+            self.dtb.append(self.treasurer.execute("""SELECT * 
+                    from Receipts""").fetchall())
         except sqlite3.OperationalError:
-            self.list_tables.append(self.treasurer.execute("""CREATE TABLE Receipts(Purchase TEXT, Cost REAL,
-            Category TEXT, Date TEXT);""").fetchall())
+            self.dtb.append(self.treasurer.execute("""CREATE TABLE 
+                    Receipts(Purchase TEXT, Cost REAL, Category 
+                    TEXT, Date TEXT);""").fetchall())
 
         self.find_cats()
 
@@ -39,7 +41,9 @@ class Spending():
                 return errors
         if date == "":
             date = str(datetime.date.today())
-        self.treasurer.execute("INSERT INTO Receipts VALUES(?, ?, ?, ?)", (purchase, cost, category, date))
+        self.treasurer.execute("""INSERT INTO Receipts VALUES
+                               (?, ?, ?, ?)""", (purchase, cost, 
+                               category, date))
         self.treasury.commit()
 
     def search_command(self, purchase, cost, category, date, use): #use is either "table" or "chart"
@@ -73,7 +77,8 @@ class Spending():
     def search_receipts_table(self, purchase, cost, category, date):
         command = self.search_command(purchase, cost, category, date, "table")
         if command == -1:
-            return self.treasurer.execute("SELECT * FROM Receipts ORDER BY Date DESC").fetchall()
+            return self.treasurer.execute("""SELECT * FROM Receipts
+                                         ORDER BY Date DESC""").fetchall()
         self.treasurer.execute(command[0], command[1])
         return self.treasurer.fetchall()
     
@@ -87,8 +92,11 @@ class Spending():
         data = []
         for i in range(len(categories)):
             search_tuple = (categories[i], ) + command[1]
-            self.treasurer.execute("SELECT sum(Cost) FROM Receipts WHERE Category LIKE ('%' || ? || '%')" 
-                                   + " AND " +command[0][command[0].index("WHERE")+6:], search_tuple)
+            self.treasurer.execute("""SELECT sum(Cost) FROM
+                                  Receipts WHERE Category LIKE 
+                                  ('%' || ? || '%')""" + " AND "
+                                  + command[0][command[0].index("WHERE")+6:],
+                                  search_tuple)
             cat_cost = self.treasurer.fetchone()
             cat_cost = cat_cost[0]
             data.append([categories[i], int(cat_cost)])
@@ -106,32 +114,35 @@ class Spending():
             if date == "":
                 errors.append(-5)
             return errors
-        self.treasurer.execute("""DELETE FROM Receipts WHERE Purchase LIKE ('%' || ? || '%') AND
-                               Cost LIKE ('%' || ? || '%') AND Category LIKE ('%' || ? || '%') AND Date LIKE ('%' || ? || '%')""", (purchase, cost, category, date))
+        self.treasurer.execute("""DELETE FROM Receipts WHERE 
+                Purchase LIKE ('%' || ? || '%') AND Cost LIKE 
+                ('%' || ? || '%') AND Category LIKE 
+                ('%' || ? || '%') AND Date LIKE ('%' || ? || '%')""", 
+                (purchase, cost, category, date))
         self.treasury.commit()
 
     def show_receipts(self):
-        self.treasurer.execute("SELECT * FROM Receipts ORDER BY Date DESC")
-        data = self.treasurer.fetchall()
-        return data
+        return self.treasurer.execute("""SELECT * FROM Receipts 
+                                ORDER BY Date DESC""").fetchall()
     
     def pie_data(self, use): #use is either chart or table, don't want total to appear in chart
         data = []
         self.find_cats()
         for cat in self.categories:
-            self.treasurer.execute("SELECT sum(Cost) FROM Receipts WHERE Category LIKE ('%' || ? || '%')", (cat,))
-            cat_cost = self.treasurer.fetchone()
-            cat_cost = cat_cost[0]
+            self.treasurer.execute("""SELECT sum(Cost) FROM
+                                Receipts WHERE Category LIKE 
+                                ('%' || ? || '%')""", (cat,))
+            cat_cost = self.treasurer.fetchone()[0]
             data.append([cat, int(cat_cost)])
         self.treasurer.execute("SELECT sum(Cost) FROM Receipts")
-        tot_cost = self.treasurer.fetchone()
-        tot_cost = tot_cost[0]
+        tot_cost = self.treasurer.fetchone()[0]
         if use == "table" and self.categories != []:
             data.append(["Total",int(tot_cost)])
         return data
     
     def find_cats(self):
-        self.categories = self.treasurer.execute("SELECT DISTINCT Category from Receipts").fetchall()
+        self.categories = self.treasurer.execute("""SELECT DISTINCT
+                                Category from Receipts""").fetchall()
         for i in range(len(self.categories)):
             self.categories[i] = self.categories[i][0]
         if len(self.categories) < 12:
