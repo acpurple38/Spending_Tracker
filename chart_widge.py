@@ -21,7 +21,6 @@ class SpendingChart(QCharts.QChart):
             sliver = QCharts.QPieSlice(d[0], d[1], parent = None)
             sliver.setLabelVisible(True)
             sliver.setColor(QGUI.QColor(self.colors[color]))
-            print(self.colors[color])
             color += 1
             if len(self.data) > len(self.colors) and color == len(self.colors):
                 color = 0
