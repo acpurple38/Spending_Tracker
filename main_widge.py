@@ -92,8 +92,12 @@ class SpendingWidget(QWidge.QWidget):
         else:
             self.trans_model.update_data(self.treasury.search_receipts_table(arg_check[0], arg_check[1], arg_check[2], arg_check[3]))
             pie_data = self.treasury.pie_search(arg_check[0], arg_check[1], arg_check[2], arg_check[3])
-            self.chart.update_outer(pie_data)
-            self.pie_model.update_data(pie_data)
+            if len(pie_data) != 2:
+                self.chart.update_outer(pie_data)
+                self.pie_model.update_data(pie_data)
+            else:
+                self.chart.update_outer(pie_data[0])
+                self.pie_model.update_data(pie_data[1])
 
     def rem_entry(self):
         purchase = self.purchase_input.text()

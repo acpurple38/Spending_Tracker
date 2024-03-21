@@ -80,7 +80,7 @@ class Spending():
     def pie_search(self, purchase, cost, category, date):
         command = self.search_command(purchase, cost, category, date, "chart")
         if command == -1:
-            return self.pie_data("chart")
+            return [self.pie_data("chart"), self.pie_data("table")]
         categories = self.treasurer.execute(command[0], command[1]).fetchall()
         for i in range(len(categories)):
             categories[i] = categories[i][0]
