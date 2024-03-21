@@ -67,7 +67,7 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        arg_check = self.arg_formatting(purchase, cost, category, date)
+        arg_check = self.arg_formatting("add", purchase, cost, category, date)
         if arg_check[0] == "CODE_ERROR":
             check = self.treasury.add_receipt(purchase, cost, category, date)
             self.error_notif("add", check, arg_check)
@@ -91,7 +91,7 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        arg_check = self.arg_formatting(purchase, cost, category, date)
+        arg_check = self.arg_formatting("search", purchase, cost, category, date)
         if arg_check[0] == "CODE_ERROR":
             self.error_notif("search", [], arg_check)
         else:
@@ -109,7 +109,7 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        arg_check = self.arg_formatting(purchase, cost, category, date)
+        arg_check = self.arg_formatting("rem", purchase, cost, category, date)
         check = self.treasury.rem_entry(purchase, cost, category, date)
         if check != None:
             self.error_notif("rem", check, arg_check)
@@ -126,7 +126,7 @@ class SpendingWidget(QWidge.QWidget):
             self.category_input.clear()
             self.date_input.clear()
 
-    def arg_formatting(self, purchase, cost, category, date):
+    def arg_formatting(self, func, purchase, cost, category, date):
         if cost == "##.##":
             cost = ""
         if date == "YYYY-MM-DD":
@@ -151,21 +151,33 @@ class SpendingWidget(QWidge.QWidget):
                             i = len(args[1])
                     args[1] = ".".join(args[1])
                 else:
-                    if len(args[3]) != 10:
-                        errors.append(-3)
+                    val = self.date_formatting(func, args[3])
+                    if val[0] == -1:
+                        errors.append(val[1])
                         return errors
                     else:
-                        args[3] = args[3].split("-")
-                        if ("".join(args[3])).isnumeric():
-                            if len(args[3][0]) == 4:
-                                args[3] = "-".join(args[3])
-                            else:
-                                errors.append(-3)
-                                return errors
-                        else:
-                            errors.append(-3)
-                            return errors
+                        args[3] = val[1]
         return args
+    
+    def date_formatting(self, func, date):
+        new_date = date
+        errors = 0
+        if func != "search":
+            if len(new_date) != 10:
+                errors = -3
+                return errors
+        new_date = new_date.split("-")
+        if ("".join(new_date)).isnumeric():
+            if len(new_date[0]) == 4:
+                new_date = "-".join(new_date)
+            else:
+                errors = -3
+                return errors
+        else:
+            errors = -3
+            return [-1, errors]
+        print(new_date)
+        return [0, new_date]
 
     def error_notif(self, func, error_code, arg_check):
         message = ""
