@@ -5,13 +5,9 @@ class SpendingChart(QCharts.QChart):
     def __init__(self, data):
         super().__init__()
         self.data = data
-        self.colors = ['000000', '#36175E', '#005f73', '#0a9396', '#94d2bd',
+        self.colors = ['#36175E', '#005f73', '#0a9396', '#94d2bd',
                 '#e9d8a6', '#ee9b00',  '#ca6702', '#bb3e03',
-                '#ae2012', '#9b2226', '#611619' ]
-        
-        # self.colors = ['#36175E', '#603979', '#8A5A93', '#9b2226',
-        #                '#ae2012', '#bb3e03', '#ca6702', '#ee9b00',
-        #                '#e9d8a6', '#94d2bd', '#0a9396', '#005f73']
+                '#ae2012', '#9b2226', '#611619', '000000' ]
 
         self.outer = QCharts.QPieSeries()
         self.set_outer()
