@@ -115,6 +115,14 @@ class Spending():
             if date == "":
                 errors.append(-5)
             return errors
+        self.treasurer.execute("""SELECT * FROM Receipts WHERE 
+                Purchase LIKE ('%' || ? || '%') AND Cost LIKE 
+                ('%' || ? || '%') AND Category LIKE 
+                ('%' || ? || '%') AND Date LIKE ('%' || ? || '%')""", 
+                (purchase, cost, category, date))
+        val_exist = self.treasurer.fetchone()
+        if val_exist == None:
+            return [-6]
         self.treasurer.execute("""DELETE FROM Receipts WHERE 
                 Purchase LIKE ('%' || ? || '%') AND Cost LIKE 
                 ('%' || ? || '%') AND Category LIKE 

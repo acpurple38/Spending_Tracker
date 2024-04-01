@@ -3,26 +3,32 @@ from table_widge import *
 from db_handling import *
 from error_window import *
 
-class SpendingWidget(QWidge.QWidget):
+from PyQt6.QtWidgets import QWidget as QWidge
+from PyQt6.QtWidgets import QLineEdit as QLE
+from PyQt6.QtWidgets import QPushButton as QPB
+from PyQt6.QtWidgets import QGridLayout as QGL
+from PyQt6.QtCharts import QChartView as QCV
+
+class SpendingWidget(QWidge):
     def __init__(self):
         super().__init__()
         self.treasury = Spending()
         self.chart = SpendingChart(self.treasury.pie_data("chart"))
-        self.chart_view = QCharts.QChartView(self.chart)
+        self.chart_view = QCV(self.chart)
         self.chart_view.show()
 
-        self.purchase_input = QWidge.QLineEdit()
-        self.purchase_label = QWidge.QLabel("Purchase:")
-        self.cost_input = QWidge.QLineEdit("##.##")
-        self.cost_label = QWidge.QLabel("Cost:")
-        self.category_input = QWidge.QLineEdit()
-        self.category_label = QWidge.QLabel("Category:")
-        self.date_input = QWidge.QLineEdit("YYYY-MM-DD")
-        self.date_label = QWidge.QLabel("Date:")
+        self.purchase_input = QLE()
+        self.purchase_label = QL("Purchase:")
+        self.cost_input = QLE("##.##")
+        self.cost_label = QL("Cost:")
+        self.category_input = QLE()
+        self.category_label = QL("Category:")
+        self.date_input = QLE("YYYY-MM-DD")
+        self.date_label = QL("Date:")
 
-        self.add_button = QWidge.QPushButton('add')
-        self.search_button = QWidge.QPushButton('search')
-        self.rem_button = QWidge.QPushButton('remove')
+        self.add_button = QPB('add')
+        self.search_button = QPB('search')
+        self.rem_button = QPB('remove')
 
         self.trans_table = SpendingTableView()
         self.trans_model = SpendingTableModel(["Purchase", "Cost", "Category", "Date Purchased"], self.treasury.show_receipts())
@@ -36,7 +42,7 @@ class SpendingWidget(QWidge.QWidget):
         self.search_button.clicked.connect(self.search_entries)
         self.rem_button.clicked.connect(self.rem_entry)
 
-        grid = QWidge.QGridLayout()
+        grid = QGL()
         grid.setSpacing(10)
 
         grid.addWidget(self.purchase_label, 0, 0, 1, 1)
@@ -106,10 +112,12 @@ class SpendingWidget(QWidge.QWidget):
         cost = self.cost_input.text()
         category = self.category_input.text()
         date = self.date_input.text()
-        check = self.treasury.rem_entry(arg_check[0], arg_check[1], arg_check[2], arg_check[3])
         arg_check = self.arg_formatting("rem", purchase, cost, category, date)
+        if arg_check[0] == "CODE_ERROR":
+            arg_check = arg_check[1:]
+        check = self.treasury.rem_entry(arg_check[0], arg_check[1], arg_check[2], arg_check[3])
         if check != None:
-            self.error_notif("rem", check, arg_check)
+            return self.error_notif("rem", check, arg_check)
         else:
             self.trans_model.update_data(self.treasury.show_receipts())
             self.chart.update_outer(self.treasury.pie_data("chart"))
@@ -210,6 +218,9 @@ class SpendingWidget(QWidge.QWidget):
                 next_message += "Date Format\n"
         if next_message != "":
             message += "\nErrors in Values: \n" + next_message
+        
+        if error_code[0] == -6:
+            message = "Value does not exist, check entered values"
 
         if message != "":
             dlg = ErrorDialog(message)

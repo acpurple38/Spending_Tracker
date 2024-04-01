@@ -1,8 +1,10 @@
-import sys
-
+from sys import exit as sysexit
+from sys import argv as sysargv
 from main_widge import *
+from PyQt6.QtWidgets import QMainWindow as QMW
+from PyQt6.QtWidgets import QApplication as QApp
 
-class SpendingWindow(QWidge.QMainWindow):
+class SpendingWindow(QMW):
     def __init__(self):
         super().__init__()
 
@@ -17,9 +19,9 @@ class SpendingWindow(QWidge.QMainWindow):
         self.show()
 
 def main():
-    app = QWidge.QApplication(sys.argv)
+    app = QApp(sysargv)
     ui = SpendingWindow()
-    sys.exit(app.exec())
+    sysexit(app.exec())
 
 if __name__ == "__main__":
     main()

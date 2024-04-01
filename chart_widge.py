@@ -1,7 +1,9 @@
-import PyQt6.QtCharts as QCharts
-import PyQt6.QtGui as QGUI
+from PyQt6.QtCharts import QChart
+from PyQt6.QtCharts import QPieSeries as QPSe
+from PyQt6.QtCharts import QPieSlice as QPSl
+from PyQt6.QtGui import QColor as QCol
 
-class SpendingChart(QCharts.QChart):
+class SpendingChart(QChart):
     def __init__(self, data):
         super().__init__()
         self.data = data
@@ -9,7 +11,7 @@ class SpendingChart(QCharts.QChart):
                 '#e9d8a6', '#ee9b00',  '#ca6702', '#bb3e03',
                 '#ae2012', '#9b2226', '#611619', '000000' ]
 
-        self.outer = QCharts.QPieSeries()
+        self.outer = QPSe()
         self.set_outer()
         self.addSeries(self.outer)
         self.legend().setVisible(False)
@@ -18,9 +20,9 @@ class SpendingChart(QCharts.QChart):
         slices = []
         color = 0
         for d in self.data:
-            sliver = QCharts.QPieSlice(d[0], d[1], parent = None)
+            sliver = QPSl(d[0], d[1], parent = None)
             sliver.setLabelVisible(True)
-            sliver.setColor(QGUI.QColor(self.colors[color]))
+            sliver.setColor(QCol(self.colors[color]))
             color += 1
             if len(self.data) > len(self.colors) and color == len(self.colors):
                 color = 0
@@ -32,6 +34,6 @@ class SpendingChart(QCharts.QChart):
         self.removeSeries(self.outer)
         self.data = new_date
         del(self.outer)
-        self.outer = QCharts.QPieSeries()
+        self.outer = QPSe()
         self.set_outer()
         self.addSeries(self.outer)

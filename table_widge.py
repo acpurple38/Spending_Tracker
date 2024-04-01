@@ -1,7 +1,8 @@
-import PyQt6.QtCore as QCore
-import PyQt6.QtWidgets as QWidge
+from PyQt6.QtCore import QAbstractTableModel as QATBM
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QTableView as QTBV
 
-class SpendingTableModel(QCore.QAbstractTableModel):
+class SpendingTableModel(QATBM):
     def __init__(self, headers, table_data = None, parent = None):
         super().__init__()
 
@@ -19,11 +20,11 @@ class SpendingTableModel(QCore.QAbstractTableModel):
         return len(self.headers)
 
     def headerData(self, section, orientation, role = None):
-        if role == QCore.Qt.ItemDataRole.DisplayRole and orientation == QCore.Qt.Orientation.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
             return self.headers[section]
         
     def data(self, index, role = None):
-        if role == QCore.Qt.ItemDataRole.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             row = index.row()
             column = index.column()
             value = self.table_data[row][column]
@@ -34,7 +35,7 @@ class SpendingTableModel(QCore.QAbstractTableModel):
         self.table_data = new_data
         self.layoutChanged.emit()
 
-class SpendingTableView(QWidge.QTableView):
+class SpendingTableView(QTBV):
     def __init__(self):
         super().__init__()
         self.setVisible(True)
@@ -46,7 +47,7 @@ class SpendingTableView(QWidge.QTableView):
         self.setColumnWidth(2, int(width * 0.25))
         self.setColumnWidth(3, int(width * 0.25))
 
-class PieTableView(QWidge.QTableView):
+class PieTableView(QTBV):
     def __init__(self):
         super().__init__()
         self.setVisible(True)
